@@ -60,6 +60,17 @@ def create_hotel_stay(activeclubid):
         days=nights
     )
 
+    future_checkin_date = (
+    check_out_date +
+    timedelta(
+        days=random.randint(10, 90)
+    )
+    )
+
+    future_property = random.choice(
+    list(properties.values())
+    )
+
     stay_data = {
 
         "PERSONID":
@@ -357,13 +368,14 @@ def create_hotel_stay(activeclubid):
             None,
 
         "FUTURE_CHECK_IN_PROPERTIES":
-            property_name,
+            future_property,
 
         "FUTURE_CHECK_IN_DATES":
-            begin_date.date().isoformat(),
+            future_checkin_date.date().isoformat(),
 
         "FUTURE_CHECK_IN_PROPERTIES_WITH_DATES":
-            f"{property_name} - {begin_date.date().isoformat()}"
+            f"{future_property} - "
+            f"{future_checkin_date.date().isoformat()}"
     }
 
     return stay_data
