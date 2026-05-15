@@ -823,7 +823,17 @@ async def hotel_activity():
             final_records.append(
                 build_hotel_event(reserve_only_data, "HOTEL:RESERVE")
             )
-            
+            cancelled_stay_data["HOTEL_ROOM_FEATURES"] = None
+            cancelled_stay_data["HOTEL_BOOKED_ROOM_CATEGORY"] = None
+            cancelled_stay_data["HOTEL_NUM_OF_NIGHTS_STAY"] = None
+            cancelled_stay_data["HOTEL_NUM_OF_NIGHTS_STAYS"] = None
+            cancelled_stay_data["HOTEL_ROOM_CLASS"] = None
+            cancelled_stay_data["HOTEL_TRANSACTION_AMOUNT"] = None
+            cancelled_stay_data["HOTEL_NUM_OF_ADULTS"] = None
+            cancelled_stay_data["HOTEL_NUM_OF_CHILDREN"] = None
+            cancelled_stay_data["HOTEL_SMOKING_ROOM"] = None
+            cancelled_stay_data["HOTEL_ROOM_CATEGORY"] = None
+            cancelled_stay_data["HOTEL_ROOM_CATEGORY_DESCRIPTION"] = None
             # --- BUILD HOTEL B: CANCEL EVENT ---
             # Emit the CANCEL event for Hotel B (Now includes cancel details, but still has no check-in/out data)
             final_records.append(
