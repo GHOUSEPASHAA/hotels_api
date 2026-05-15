@@ -10,7 +10,6 @@ app = FastAPI(title="Hotel Activity API")
 
 fake = Faker()
 
-
 properties = {
     "GRC": "Grand Royale Casino",
     "AC": "Atlantis Casino",
@@ -18,7 +17,7 @@ properties = {
 }
 
 
-def generate_hotel_event(activeclubid, event_action):
+def create_hotel_stay(activeclubid):
 
     personid = str(
         int(
@@ -35,11 +34,17 @@ def generate_hotel_event(activeclubid, event_action):
 
     property_name = properties[property_id]
 
-    reservation_id = fake.numerify("##########")
+    reservation_id = fake.numerify(
+        "##########"
+    )
 
-    membership_id = fake.numerify("######")
+    membership_id = fake.numerify(
+        "######"
+    )
 
-    membership_card = fake.bothify("MC########")
+    membership_card = fake.bothify(
+        "MC########"
+    )
 
     room_number = str(
         random.randint(100, 999)
@@ -55,46 +60,23 @@ def generate_hotel_event(activeclubid, event_action):
         days=nights
     )
 
-    cancel_date = begin_date - timedelta(hours=3)
+    stay_data = {
 
-    timezone_map = {
-        "ADT": begin_date.isoformat(),
-        "AST": begin_date.isoformat(),
-        "CDT": begin_date.isoformat(),
-        "CST": begin_date.isoformat(),
-        "EST": begin_date.isoformat(),
-        "MDT": begin_date.isoformat(),
-        "MST": begin_date.isoformat(),
-        "PDT": begin_date.isoformat()
-    }
-
-    reservation_status = {
-        "HOTEL:RESERVE": "RESERVED",
-        "HOTEL:CHECK_IN": "CHECKED_IN",
-        "HOTEL:CHECK_OUT": "CHECKED_OUT"
-    }[event_action]
-
-    return {
-
-        "EVENT_GROUP_ID":
-            fake.uuid4(),
-
-        "PERSONID": personid,
+        "PERSONID":
+            personid,
 
         "ACTIVECLUBID":
             activeclubid,
 
-        "ENTITY":
-            "HOTEL",
-
-        "ENTITY_ACTION":
-            event_action,
+        "EVENT_GROUP_ID":
+            fake.uuid4(),
 
         "PROPERTY_ID":
             property_id,
 
         "SF_PROPERTY_ID":
             property_id,
+
 
         "PROPERTY_NAME":
             property_name,
@@ -166,9 +148,6 @@ def generate_hotel_event(activeclubid, event_action):
                 2
             ),
 
-        "HOTEL_RESERVATION_STATUS":
-            reservation_status,
-
         "HOTEL_REINSTATE_TIMESTAMP_PROPERTY":
             None,
 
@@ -184,30 +163,6 @@ def generate_hotel_event(activeclubid, event_action):
         "HOTEL_RESERVATION_CREATION_DATE":
             begin_date.date().isoformat(),
 
-        "HOTEL_RESERVATION_TIMESTAMP_ADT":
-            timezone_map["ADT"],
-
-        "HOTEL_RESERVATION_TIMESTAMP_AST":
-            timezone_map["AST"],
-
-        "HOTEL_RESERVATION_TIMESTAMP_CDT":
-            timezone_map["CDT"],
-
-        "HOTEL_RESERVATION_TIMESTAMP_CST":
-            timezone_map["CST"],
-
-        "HOTEL_RESERVATION_TIMESTAMP_EST":
-            timezone_map["EST"],
-
-        "HOTEL_RESERVATION_TIMESTAMP_MDT":
-            timezone_map["MDT"],
-
-        "HOTEL_RESERVATION_TIMESTAMP_MST":
-            timezone_map["MST"],
-
-        "HOTEL_RESERVATION_TIMESTAMP_PDT":
-            timezone_map["PDT"],
-
         "HOTEL_CHECK_IN_TIMESTAMP_PROPERTY":
             begin_date.isoformat(),
 
@@ -216,30 +171,6 @@ def generate_hotel_event(activeclubid, event_action):
 
         "HOTEL_CHECK_IN_DATE":
             begin_date.date().isoformat(),
-
-        "HOTEL_CHECK_IN_TIMESTAMP_ADT":
-            timezone_map["ADT"],
-
-        "HOTEL_CHECK_IN_TIMESTAMP_AST":
-            timezone_map["AST"],
-
-        "HOTEL_CHECK_IN_TIMESTAMP_CDT":
-            timezone_map["CDT"],
-
-        "HOTEL_CHECK_IN_TIMESTAMP_CST":
-            timezone_map["CST"],
-
-        "HOTEL_CHECK_IN_TIMESTAMP_EST":
-            timezone_map["EST"],
-
-        "HOTEL_CHECK_IN_TIMESTAMP_MDT":
-            timezone_map["MDT"],
-
-        "HOTEL_CHECK_IN_TIMESTAMP_MST":
-            timezone_map["MST"],
-
-        "HOTEL_CHECK_IN_TIMESTAMP_PDT":
-            timezone_map["PDT"],
 
         "HOTEL_WL_PRIORITY":
             random.choice([
@@ -338,30 +269,6 @@ def generate_hotel_event(activeclubid, event_action):
         "HOTEL_CHECK_OUT_DATE":
             check_out_date.date().isoformat(),
 
-        "HOTEL_CHECK_OUT_TIMESTAMP_ADT":
-            check_out_date.isoformat(),
-
-        "HOTEL_CHECK_OUT_TIMESTAMP_AST":
-            check_out_date.isoformat(),
-
-        "HOTEL_CHECK_OUT_TIMESTAMP_CDT":
-            check_out_date.isoformat(),
-
-        "HOTEL_CHECK_OUT_TIMESTAMP_CST":
-            check_out_date.isoformat(),
-
-        "HOTEL_CHECK_OUT_TIMESTAMP_EST":
-            check_out_date.isoformat(),
-
-        "HOTEL_CHECK_OUT_TIMESTAMP_MDT":
-            check_out_date.isoformat(),
-
-        "HOTEL_CHECK_OUT_TIMESTAMP_MST":
-            check_out_date.isoformat(),
-
-        "HOTEL_CHECK_OUT_TIMESTAMP_PDT":
-            check_out_date.isoformat(),
-
         "HOTEL_CANCELLATION_NO":
             None,
 
@@ -377,30 +284,6 @@ def generate_hotel_event(activeclubid, event_action):
         "HOTEL_CANCEL_DATE":
             None,
 
-        "HOTEL_CANCEL_TIMESTAMP_ADT":
-            None,
-
-        "HOTEL_CANCEL_TIMESTAMP_AST":
-            None,
-
-        "HOTEL_CANCEL_TIMESTAMP_CDT":
-            None,
-
-        "HOTEL_CANCEL_TIMESTAMP_CST":
-            None,
-
-        "HOTEL_CANCEL_TIMESTAMP_EST":
-            None,
-
-        "HOTEL_CANCEL_TIMESTAMP_MDT":
-            None,
-
-        "HOTEL_CANCEL_TIMESTAMP_MST":
-            None,
-
-        "HOTEL_CANCEL_TIMESTAMP_PDT":
-            None,
-
         "FUTURE_CHECK_IN_PROPERTIES":
             property_name,
 
@@ -411,11 +294,316 @@ def generate_hotel_event(activeclubid, event_action):
             f"{property_name} - {begin_date.date().isoformat()}"
     }
 
+    return stay_data
+
+
+def build_hotel_event(
+    stay_data,
+    event_action
+):
+
+    record = stay_data.copy()
+
+    reservation_status = {
+        "HOTEL:RESERVE": "RESERVED",
+        "HOTEL:CHECK_IN": "CHECKED_IN",
+        "HOTEL:CHECK_OUT": "CHECKED_OUT"
+    }
+
+    record["ENTITY"] = "HOTEL"
+
+    record["ENTITY_ACTION"] = event_action
+
+    record["HOTEL_RESERVATION_STATUS"] = (
+        reservation_status[event_action]
+    )
+
+    return {
+
+    "EVENT_GROUP_ID":
+        record["EVENT_GROUP_ID"],
+
+    "PERSONID": record["PERSONID"],
+
+    "ACTIVECLUBID":
+            record["ACTIVECLUBID"],
+
+    "PROPERTY_ID":
+        record["PROPERTY_ID"],
+
+    "SF_PROPERTY_ID":
+        record["SF_PROPERTY_ID"],
+
+    "PROPERTY_NAME":
+        record["PROPERTY_NAME"],
+
+    "HOTEL_RESERVATION_ID":
+        record["HOTEL_RESERVATION_ID"],
+
+    "HOTEL_MEMBERSHIP_CARD_NO":
+        record["HOTEL_MEMBERSHIP_CARD_NO"],
+
+    "HOTEL_MEMBERSHIP_ID":
+        record["HOTEL_MEMBERSHIP_ID"],
+
+    "HOTEL_MEMBERSHIP_LEVEL":
+        record["HOTEL_MEMBERSHIP_LEVEL"],
+
+    "HOTEL_NAME_ID":
+        record["HOTEL_NAME_ID"],
+
+    "HOTEL_FOLIO_CLOSE_DATE":
+        record["HOTEL_FOLIO_CLOSE_DATE"],
+
+    "HOTEL_ADVANCE_CHECKED_IN_YN":
+        record["HOTEL_ADVANCE_CHECKED_IN_YN"],
+
+    "HOTEL_POSTING_ALLOWED_YN":
+        record["HOTEL_POSTING_ALLOWED_YN"],
+
+    "HOTEL_VIDEO_CHECKOUT_YN":
+        record["HOTEL_VIDEO_CHECKOUT_YN"],
+
+    "HOTEL_INTERMEDIARY_YN":
+        record["HOTEL_INTERMEDIARY_YN"],
+
+    "HOTEL_WALKIN_YN":
+        record["HOTEL_WALKIN_YN"],
+
+    "HOTEL_PSUEDO_ROOM_YN":
+        record["HOTEL_PSUEDO_ROOM_YN"],
+
+    "HOTEL_WL_TELEPHONE_NO":
+        record["HOTEL_WL_TELEPHONE_NO"],
+
+    "HOTEL_PAYMENT_METHOD":
+        record["HOTEL_PAYMENT_METHOD"],
+
+    "HOTEL_CHANNEL":
+        record["HOTEL_CHANNEL"],
+
+    "HOTEL_CUSTOM_REFERENCE":
+        record["HOTEL_CUSTOM_REFERENCE"],
+
+    "HOTEL_RATEABLE_VALUE":
+        record["HOTEL_RATEABLE_VALUE"],
+
+    "HOTEL_RESERVATION_STATUS":
+        record["HOTEL_RESERVATION_STATUS"],
+
+    "HOTEL_REINSTATE_TIMESTAMP_PROPERTY":
+        record["HOTEL_REINSTATE_TIMESTAMP_PROPERTY"],
+
+    "HOTEL_EVENT_TIMESTAMP_PROPERTY_TIMEZONE":
+        record["HOTEL_EVENT_TIMESTAMP_PROPERTY_TIMEZONE"],
+
+    "HOTEL_EVENT_TIMESTAMP_PROPERTY_TIMEZONE_ABBR":
+        record["HOTEL_EVENT_TIMESTAMP_PROPERTY_TIMEZONE_ABBR"],
+
+    "HOTEL_RESERVATION_TIMESTAMP_PROPERTY":
+        record["HOTEL_RESERVATION_TIMESTAMP_PROPERTY"],
+
+    "HOTEL_RESERVATION_CREATION_DATE":
+        record["HOTEL_RESERVATION_CREATION_DATE"],
+
+    "HOTEL_RESERVATION_TIMESTAMP_ADT":
+        record.get("HOTEL_RESERVATION_TIMESTAMP_ADT"),
+
+    "HOTEL_RESERVATION_TIMESTAMP_AST":
+        record.get("HOTEL_RESERVATION_TIMESTAMP_AST"),
+
+    "HOTEL_RESERVATION_TIMESTAMP_CDT":
+        record.get("HOTEL_RESERVATION_TIMESTAMP_CDT"),
+
+    "HOTEL_RESERVATION_TIMESTAMP_CST":
+        record.get("HOTEL_RESERVATION_TIMESTAMP_CST"),
+
+    "HOTEL_RESERVATION_TIMESTAMP_EST":
+        record.get("HOTEL_RESERVATION_TIMESTAMP_EST"),
+
+    "HOTEL_RESERVATION_TIMESTAMP_MDT":
+        record.get("HOTEL_RESERVATION_TIMESTAMP_MDT"),
+
+    "HOTEL_RESERVATION_TIMESTAMP_MST":
+        record.get("HOTEL_RESERVATION_TIMESTAMP_MST"),
+
+    "HOTEL_RESERVATION_TIMESTAMP_PDT":
+        record.get("HOTEL_RESERVATION_TIMESTAMP_PDT"),
+
+    "HOTEL_CHECK_IN_TIMESTAMP_PROPERTY":
+        record["HOTEL_CHECK_IN_TIMESTAMP_PROPERTY"],
+
+    "HOTEL_CHECK_OUT_TIMESTAMP_PROPERTY":
+        record["HOTEL_CHECK_OUT_TIMESTAMP_PROPERTY"],
+
+    "HOTEL_CHECK_IN_DATE":
+        record["HOTEL_CHECK_IN_DATE"],
+
+    "HOTEL_CHECK_IN_TIMESTAMP_ADT":
+        record.get("HOTEL_CHECK_IN_TIMESTAMP_ADT"),
+
+    "HOTEL_CHECK_IN_TIMESTAMP_AST":
+        record.get("HOTEL_CHECK_IN_TIMESTAMP_AST"),
+
+    "HOTEL_CHECK_IN_TIMESTAMP_CDT":
+        record.get("HOTEL_CHECK_IN_TIMESTAMP_CDT"),
+
+    "HOTEL_CHECK_IN_TIMESTAMP_CST":
+        record.get("HOTEL_CHECK_IN_TIMESTAMP_CST"),
+
+    "HOTEL_CHECK_IN_TIMESTAMP_EST":
+        record.get("HOTEL_CHECK_IN_TIMESTAMP_EST"),
+
+    "HOTEL_CHECK_IN_TIMESTAMP_MDT":
+        record.get("HOTEL_CHECK_IN_TIMESTAMP_MDT"),
+
+    "HOTEL_CHECK_IN_TIMESTAMP_MST":
+        record.get("HOTEL_CHECK_IN_TIMESTAMP_MST"),
+
+    "HOTEL_CHECK_IN_TIMESTAMP_PDT":
+        record.get("HOTEL_CHECK_IN_TIMESTAMP_PDT"),
+
+    "HOTEL_WL_PRIORITY":
+        record["HOTEL_WL_PRIORITY"],
+
+    "HOTEL_ROOM_FEATURES":
+        record["HOTEL_ROOM_FEATURES"],
+
+    "HOTEL_BOOKED_ROOM_CATEGORY":
+        record["HOTEL_BOOKED_ROOM_CATEGORY"],
+
+    "HOTEL_RATE_CODE":
+        record["HOTEL_RATE_CODE"],
+
+    "HOTEL_RATE_CATEGORY":
+        record["HOTEL_RATE_CATEGORY"],
+
+    "HOTEL_MARKET_CODE":
+        record["HOTEL_MARKET_CODE"],
+
+    "HOTEL_PROMOTION_CODE":
+        record["HOTEL_PROMOTION_CODE"],
+
+    "HOTEL_NUM_OF_NIGHTS_STAY":
+        record["HOTEL_NUM_OF_NIGHTS_STAY"],
+
+    "HOTEL_NUM_OF_NIGHTS_STAYS":
+        record["HOTEL_NUM_OF_NIGHTS_STAYS"],
+
+    "HOTEL_ROOM_CLASS":
+        record["HOTEL_ROOM_CLASS"],
+
+    "HOTEL_TRANSACTION_AMOUNT":
+        record["HOTEL_TRANSACTION_AMOUNT"],
+
+    "HOTEL_NUM_OF_ADULTS":
+        record["HOTEL_NUM_OF_ADULTS"],
+
+    "HOTEL_NUM_OF_CHILDREN":
+        record["HOTEL_NUM_OF_CHILDREN"],
+
+    "HOTEL_SMOKING_ROOM":
+        record["HOTEL_SMOKING_ROOM"],
+
+    "HOTEL_ROOM_CATEGORY":
+        record["HOTEL_ROOM_CATEGORY"],
+
+    "HOTEL_ROOM_CATEGORY_DESCRIPTION":
+        record["HOTEL_ROOM_CATEGORY_DESCRIPTION"],
+
+    "HOTEL_ROOM_NUMBER":
+        record["HOTEL_ROOM_NUMBER"],
+
+    "HOTEL_CASH_ROOM_REVENUE":
+        record["HOTEL_CASH_ROOM_REVENUE"],
+
+    "HOTEL_COMP_ROOM_REVENUE":
+        record["HOTEL_COMP_ROOM_REVENUE"],
+
+    "HOTEL_CHECK_OUT_DATE":
+        record["HOTEL_CHECK_OUT_DATE"],
+
+    "HOTEL_CHECK_OUT_TIMESTAMP_ADT":
+        record.get("HOTEL_CHECK_OUT_TIMESTAMP_ADT"),
+
+    "HOTEL_CHECK_OUT_TIMESTAMP_AST":
+        record.get("HOTEL_CHECK_OUT_TIMESTAMP_AST"),
+
+    "HOTEL_CHECK_OUT_TIMESTAMP_CDT":
+        record.get("HOTEL_CHECK_OUT_TIMESTAMP_CDT"),
+
+    "HOTEL_CHECK_OUT_TIMESTAMP_CST":
+        record.get("HOTEL_CHECK_OUT_TIMESTAMP_CST"),
+
+    "HOTEL_CHECK_OUT_TIMESTAMP_EST":
+        record.get("HOTEL_CHECK_OUT_TIMESTAMP_EST"),
+
+    "HOTEL_CHECK_OUT_TIMESTAMP_MDT":
+        record.get("HOTEL_CHECK_OUT_TIMESTAMP_MDT"),
+
+    "HOTEL_CHECK_OUT_TIMESTAMP_MST":
+        record.get("HOTEL_CHECK_OUT_TIMESTAMP_MST"),
+
+    "HOTEL_CHECK_OUT_TIMESTAMP_PDT":
+        record.get("HOTEL_CHECK_OUT_TIMESTAMP_PDT"),
+
+    "HOTEL_CANCELLATION_NO":
+        record["HOTEL_CANCELLATION_NO"],
+
+    "HOTEL_CANCELLATION_REASON":
+        record["HOTEL_CANCELLATION_REASON"],
+
+    "HOTEL_CANCELLATION_REASON_CODE":
+        record["HOTEL_CANCELLATION_REASON_CODE"],
+
+    "HOTEL_CANCEL_TIMESTAMP_PROPERTY":
+        record["HOTEL_CANCEL_TIMESTAMP_PROPERTY"],
+
+    "HOTEL_CANCEL_DATE":
+        record["HOTEL_CANCEL_DATE"],
+
+    "HOTEL_CANCEL_TIMESTAMP_ADT":
+        record.get("HOTEL_CANCEL_TIMESTAMP_ADT"),
+
+    "HOTEL_CANCEL_TIMESTAMP_AST":
+        record.get("HOTEL_CANCEL_TIMESTAMP_AST"),
+
+    "HOTEL_CANCEL_TIMESTAMP_CDT":
+        record.get("HOTEL_CANCEL_TIMESTAMP_CDT"),
+
+    "HOTEL_CANCEL_TIMESTAMP_CST":
+        record.get("HOTEL_CANCEL_TIMESTAMP_CST"),
+
+    "HOTEL_CANCEL_TIMESTAMP_EST":
+        record.get("HOTEL_CANCEL_TIMESTAMP_EST"),
+
+    "HOTEL_CANCEL_TIMESTAMP_MDT":
+        record.get("HOTEL_CANCEL_TIMESTAMP_MDT"),
+
+    "HOTEL_CANCEL_TIMESTAMP_MST":
+        record.get("HOTEL_CANCEL_TIMESTAMP_MST"),
+
+    "HOTEL_CANCEL_TIMESTAMP_PDT":
+        record.get("HOTEL_CANCEL_TIMESTAMP_PDT"),
+
+    "FUTURE_CHECK_IN_PROPERTIES":
+        record["FUTURE_CHECK_IN_PROPERTIES"],
+
+    "FUTURE_CHECK_IN_DATES":
+        record["FUTURE_CHECK_IN_DATES"],
+
+    "FUTURE_CHECK_IN_PROPERTIES_WITH_DATES":
+        record["FUTURE_CHECK_IN_PROPERTIES_WITH_DATES"]
+    }
+
 
 @app.get("/v1/hotel-activity")
 async def hotel_activity():
 
-    api_url = "https://casino-api-ob26.onrender.com/v1/player-activity"
+    api_url = (
+        "https://casino-api-ob26.onrender.com/"
+        "v1/player-activity"
+    )
 
     response = requests.get(api_url)
 
@@ -444,6 +632,10 @@ async def hotel_activity():
 
     for activeclubid in unique_activeclubids:
 
+        stay_data = create_hotel_stay(
+            activeclubid
+        )
+
         for action in [
             "HOTEL:RESERVE",
             "HOTEL:CHECK_IN",
@@ -451,8 +643,8 @@ async def hotel_activity():
         ]:
 
             final_records.append(
-                generate_hotel_event(
-                    activeclubid,
+                build_hotel_event(
+                    stay_data,
                     action
                 )
             )
@@ -465,5 +657,5 @@ if __name__ == "__main__":
     uvicorn.run(
         app,
         host="0.0.0.0",
-        port=8001
+        port=8000
     )
