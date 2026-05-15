@@ -163,6 +163,30 @@ def create_hotel_stay(activeclubid):
         "HOTEL_RESERVATION_CREATION_DATE":
             begin_date.date().isoformat(),
 
+        "HOTEL_RESERVATION_TIMESTAMP_ADT":
+            begin_date.isoformat(),
+
+        "HOTEL_RESERVATION_TIMESTAMP_AST":
+            begin_date.isoformat(),
+
+        "HOTEL_RESERVATION_TIMESTAMP_CDT":
+            begin_date.isoformat(),
+
+        "HOTEL_RESERVATION_TIMESTAMP_CST":
+            begin_date.isoformat(),
+
+        "HOTEL_RESERVATION_TIMESTAMP_EST":
+            begin_date.isoformat(),
+
+        "HOTEL_RESERVATION_TIMESTAMP_MDT":
+            begin_date.isoformat(),
+
+        "HOTEL_RESERVATION_TIMESTAMP_MST":
+            begin_date.isoformat(),
+
+        "HOTEL_RESERVATION_TIMESTAMP_PDT":
+            begin_date.isoformat(),
+
         "HOTEL_CHECK_IN_TIMESTAMP_PROPERTY":
             begin_date.isoformat(),
 
@@ -171,6 +195,30 @@ def create_hotel_stay(activeclubid):
 
         "HOTEL_CHECK_IN_DATE":
             begin_date.date().isoformat(),
+        
+        "HOTEL_CHECK_IN_TIMESTAMP_ADT":
+            begin_date.isoformat(),
+
+        "HOTEL_CHECK_IN_TIMESTAMP_AST":
+            begin_date.isoformat(),
+
+        "HOTEL_CHECK_IN_TIMESTAMP_CDT":
+            begin_date.isoformat(),
+
+        "HOTEL_CHECK_IN_TIMESTAMP_CST":
+            begin_date.isoformat(),
+
+        "HOTEL_CHECK_IN_TIMESTAMP_EST":
+            begin_date.isoformat(),
+
+        "HOTEL_CHECK_IN_TIMESTAMP_MDT":
+            begin_date.isoformat(),
+
+        "HOTEL_CHECK_IN_TIMESTAMP_MST":
+            begin_date.isoformat(),
+
+        "HOTEL_CHECK_IN_TIMESTAMP_PDT":
+            begin_date.isoformat(),
 
         "HOTEL_WL_PRIORITY":
             random.choice([
@@ -268,6 +316,30 @@ def create_hotel_stay(activeclubid):
 
         "HOTEL_CHECK_OUT_DATE":
             check_out_date.date().isoformat(),
+
+        "HOTEL_CHECK_OUT_TIMESTAMP_ADT":
+            check_out_date.isoformat(),
+
+        "HOTEL_CHECK_OUT_TIMESTAMP_AST":
+            check_out_date.isoformat(),
+
+        "HOTEL_CHECK_OUT_TIMESTAMP_CDT":
+            check_out_date.isoformat(),
+
+        "HOTEL_CHECK_OUT_TIMESTAMP_CST":
+            check_out_date.isoformat(),
+
+        "HOTEL_CHECK_OUT_TIMESTAMP_EST":
+            check_out_date.isoformat(),
+
+        "HOTEL_CHECK_OUT_TIMESTAMP_MDT":
+            check_out_date.isoformat(),
+
+        "HOTEL_CHECK_OUT_TIMESTAMP_MST":
+            check_out_date.isoformat(),
+
+        "HOTEL_CHECK_OUT_TIMESTAMP_PDT":
+            check_out_date.isoformat(),
 
         "HOTEL_CANCELLATION_NO":
             None,
@@ -657,5 +729,5 @@ if __name__ == "__main__":
     uvicorn.run(
         app,
         host="0.0.0.0",
-        port=8000
+        port=8001
     )
