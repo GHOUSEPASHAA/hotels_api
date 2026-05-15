@@ -50,6 +50,10 @@ def create_hotel_stay(activeclubid):
         random.randint(100, 999)
     )
 
+    reservation_date = datetime.now() - timedelta(
+    days=random.randint(20, 120)
+    )
+
     begin_date = datetime.now() - timedelta(
         days=random.randint(1, 30)
     )
@@ -183,34 +187,34 @@ def create_hotel_stay(activeclubid):
             "EST",
 
         "HOTEL_RESERVATION_TIMESTAMP_PROPERTY":
-            begin_date.isoformat(),
+            reservation_date.isoformat(),
 
         "HOTEL_RESERVATION_CREATION_DATE":
-            begin_date.date().isoformat(),
+            reservation_date.date().isoformat(),
 
         "HOTEL_RESERVATION_TIMESTAMP_ADT":
-            begin_date.isoformat(),
+            reservation_date.isoformat(),
 
         "HOTEL_RESERVATION_TIMESTAMP_AST":
-            begin_date.isoformat(),
+            reservation_date.isoformat(),
 
         "HOTEL_RESERVATION_TIMESTAMP_CDT":
-            begin_date.isoformat(),
+            reservation_date.isoformat(),
 
         "HOTEL_RESERVATION_TIMESTAMP_CST":
-            begin_date.isoformat(),
+            reservation_date.isoformat(),
 
         "HOTEL_RESERVATION_TIMESTAMP_EST":
-            begin_date.isoformat(),
+            reservation_date.isoformat(),
 
         "HOTEL_RESERVATION_TIMESTAMP_MDT":
-            begin_date.isoformat(),
+            reservation_date.isoformat(),
 
         "HOTEL_RESERVATION_TIMESTAMP_MST":
-            begin_date.isoformat(),
+            reservation_date.isoformat(),
 
         "HOTEL_RESERVATION_TIMESTAMP_PDT":
-            begin_date.isoformat(),
+            reservation_date.isoformat(),
 
         "HOTEL_CHECK_IN_TIMESTAMP_PROPERTY":
             begin_date.isoformat(),
