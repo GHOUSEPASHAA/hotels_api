@@ -71,6 +71,18 @@ def create_hotel_stay(activeclubid):
     list(properties.values())
     )
 
+    room_category_map = {
+    "KING": "Luxury King Room",
+    "QUEEN": "Luxury Queen Room",
+    "SUITE": "Executive Suite",
+    "DOUBLE": "Double Bed Room",
+    "PENTHOUSE": "Penthouse Suite"
+    }
+
+    selected_room_category = random.choice(
+        list(room_category_map.keys())
+    )
+
     stay_data = {
 
         "PERSONID":
@@ -305,10 +317,12 @@ def create_hotel_stay(activeclubid):
             random.choice(["Y", "N"]),
 
         "HOTEL_ROOM_CATEGORY":
-            "KING",
+            selected_room_category,
 
         "HOTEL_ROOM_CATEGORY_DESCRIPTION":
-            "Luxury King Room",
+            room_category_map[
+                selected_room_category
+            ],
 
         "HOTEL_ROOM_NUMBER":
             room_number,
