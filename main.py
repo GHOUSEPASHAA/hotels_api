@@ -2,495 +2,125 @@ from fastapi import FastAPI
 from faker import Faker
 import random
 import hashlib
-from datetime import datetime
 from datetime import datetime, timedelta
+import requests
 import uvicorn
 
-app = FastAPI(title="Casino Gaming Data API")
+app = FastAPI(title="Hotel Activity API")
 
 fake = Faker()
 
 
-def generate_gaming_record(person_id: str):
-    """
-    Generates persistent player profile data
-    with dynamic gaming transaction data.
-    """
+properties = {
+    "GRC": "Grand Royale Casino",
+    "AC": "Atlantis Casino",
+    "RRC": "Red Rock Casino"
+}
 
-    # Stable hash from person_id
-    stable_hash = int(
-        hashlib.md5(person_id.encode()).hexdigest(),
-        16
-    ) % (10**8)
 
-    # Seed faker/random for stable profile
-    fake.seed_instance(stable_hash)
-    random.seed(stable_hash)
+def generate_hotel_event(activeclubid, event_action):
 
-    # Persistent player info
-    first_name = fake.first_name()
-    last_name = fake.last_name()
-
-    club_level = random.choice(
-        ["Gold", "Silver", "Platinum", "Diamond"]
+    personid = str(
+        int(
+            hashlib.md5(
+                activeclubid.encode()
+            ).hexdigest(),
+            16
+        ) % 90000 + 10000
     )
 
-    serial_number = fake.bothify(
-        text='SN-####-####'
-    )
-
-    game_title = random.choice([
-        "88 Fortunes",
-        "Buffalo Gold",
-        "Wheel of Fortune",
-        "Blackjack T1"
-    ])
-
-    # Stable PERSONID
-    personid = fake.numerify(
-        text='######'
-    )
-
-    personid2 = str(
-    int(
-        hashlib.md5(
-            personid.encode()
-        ).hexdigest(),
-        16
-    ) % 90000 + 10000
-)
-
-    # Stable ACTIVECLUBID (13 digits)
-    activeclubid = fake.numerify(
-        text='#############'
-    )
-
-    # Stable ENTITY_ACTION
-    
-
-    address1 = fake.street_address()
-
-    city = fake.city()
-
-    state_province = fake.state()
-
-    country = fake.country()
-
-    postal_code = fake.postcode()
-
-    birthdate = fake.date_of_birth(
-        minimum_age=21,
-        maximum_age=80
-    )
-
-    gender = random.choice([
-        "Male",
-        "Female"
-    ])
-
-    
-
-    
-
-   
-
-
-    ##################################
-    # Dynamic Host / CMP Data
-    ##################################
-    # Reset random seed for dynamic values
-    random.seed(None)
-    fake.seed_instance(None)
-
-
-    entity_action = random.choice([
-        "HOTEL:CANCEL",
-        "HOTEL:NO_SHOW",
-        "HOTEL:RESERVE",
-        "HOTEL:CHECK_OUT",
-        "HOTEL:CHECK_IN"
-    ])
-    
-
-    properties = {
-        "GRC": "Grand Royale Casino",
-        "AC": "Atlantis Casino",
-        "RRC": "Red Rock Casino"
-    }
-
-    
-
-    
-
-    
-
- 
-
-    
-    
-
-    # Dynamic gaming transaction values
-    bet = round(
-        random.uniform(1.0, 100.0),
-        2
-    )
-
-    hold_pct = random.uniform(0.05, 0.15)
-
-    theo_win = round(
-        bet * hold_pct,
-        2
-    )
-
-    win_chance = random.random()
-
-    if win_chance > 0.6:
-        paid_out = round(
-            bet * random.uniform(1.2, 5.0),
-            2
-        )
-    else:
-        paid_out = 0.0
-
-    casino_win = round(
-        bet - paid_out,
-        2
-    )
-
-        # Random timestamp within last 1 year
-    days_back = random.randint(0, 365)
-
-    seconds_back = random.randint(
-        0,
-        86400
-    )
-
-    
-
-    timestamp = datetime.now() - timedelta(
-        days=days_back,
-        seconds=seconds_back
-    )
-
-    
-
-    ############################
-    
-
-    player_value = round(
-        random.uniform(1.0, 30.0),
-        4
-    )
-
-    #####
-    
-    
-    game_duration_min = random.randint(
-        1,
-        480
-    )
-
-    hotel_property_id = random.choice(
+    property_id = random.choice(
         list(properties.keys())
     )
 
-    property_name = properties[
-        hotel_property_id
-    ]
+    property_name = properties[property_id]
 
-    hotel_membership_levels = [
-        "Gold",
-        "Silver",
-        "Platinum",
-        "Diamond"
-    ]
+    reservation_id = fake.numerify("##########")
 
-    reservation_statuses = [
-        "BOOKED",
-        "CHECKED_IN",
-        "CHECKED_OUT",
-        "CANCELLED",
-        "NO_SHOW"
-    ]
+    membership_id = fake.numerify("######")
 
-    payment_methods = [
-        "CASH",
-        "CREDIT_CARD",
-        "DEBIT_CARD",
-        "COMP"
-    ]
+    membership_card = fake.bothify("MC########")
 
-    channels = [
-        "ONLINE",
-        "PHONE",
-        "WALKIN",
-        "MOBILE_APP"
-    ]
-
-    room_classes = [
-        "STANDARD",
-        "DELUXE",
-        "SUITE",
-        "VIP"
-    ]
-
-    room_categories = [
-        "KING",
-        "QUEEN",
-        "DOUBLE",
-        "PENTHOUSE"
-    ]
-
-    rate_categories = [
-        "BAR",
-        "COMP",
-        "DISCOUNT",
-        "VIP"
-    ]
-
-    market_codes = [
-        "LOCAL",
-        "TOURISM",
-        "VIP",
-        "CORPORATE"
-    ]
-
-    promotion_codes = [
-        "WELCOME",
-        "SUMMER2026",
-        "VIPFREE",
-        "NONE"
-    ]
-
-    reservation_status = random.choice(
-        reservation_statuses
+    room_number = str(
+        random.randint(100, 999)
     )
 
-    now = datetime.now()
-
-    business_created_date = (
-        now - timedelta(
-            days=random.randint(1, 60)
-        )
+    begin_date = datetime.now() - timedelta(
+        days=random.randint(1, 30)
     )
 
-    begin_date = (
-        now - timedelta(
-            days=random.randint(0, 30)
-        )
+    nights = random.randint(1, 5)
+
+    check_out_date = begin_date + timedelta(
+        days=nights
     )
 
-    nights = random.randint(1, 10)
+    cancel_date = begin_date - timedelta(hours=3)
 
-    end_date = (
-        begin_date + timedelta(days=nights)
-    )
+    timezone_map = {
+        "ADT": begin_date.isoformat(),
+        "AST": begin_date.isoformat(),
+        "CDT": begin_date.isoformat(),
+        "CST": begin_date.isoformat(),
+        "EST": begin_date.isoformat(),
+        "MDT": begin_date.isoformat(),
+        "MST": begin_date.isoformat(),
+        "PDT": begin_date.isoformat()
+    }
 
-    folio_close_date = end_date.date()
-
-    cancellation_date = None
-
-    reinstate_date = None
-
-    cancellation_reason_code = None
-
-    cancellation_reason_desc = None
-
-    cancellation_no = None
-
-    if reservation_status == "CANCELLED":
-
-        cancellation_date = (
-            begin_date - timedelta(
-                hours=random.randint(1, 48)
-            )
-        )
-
-        cancellation_reason_code = random.choice([
-            "PAYMENT",
-            "TRAVEL",
-            "PERSONAL"
-        ])
-
-        cancellation_reason_desc = random.choice([
-            "Payment declined",
-            "Travel issue",
-            "Personal emergency"
-        ])
-
-        cancellation_no = fake.bothify(
-            text='CAN########'
-        )
-
-        if random.choice([True, False]):
-
-            reinstate_date = (
-                cancellation_date +
-                timedelta(hours=4)
-            )
-
-    hotel_cash_room_revenue = round(
-        random.uniform(100, 5000),
-        2
-    )
-
-    hotel_comp_room_revenue = round(
-        random.uniform(0, 2000),
-        2
-    )
-
+    reservation_status = {
+        "HOTEL:RESERVE": "RESERVED",
+        "HOTEL:CHECK_IN": "CHECKED_IN",
+        "HOTEL:CHECK_OUT": "CHECKED_OUT"
+    }[event_action]
 
     return {
 
+        "EVENT_GROUP_ID":
+            fake.uuid4(),
+
         "PERSONID": personid,
 
+        "ACTIVECLUBID":
+            activeclubid,
 
-        "PERSONID2": personid2,
+        "ENTITY":
+            "HOTEL",
 
-        "ACTIVECLUBID": activeclubid,
+        "ENTITY_ACTION":
+            event_action,
 
-        "PERSON_FIRST_NAME": first_name,
+        "PROPERTY_ID":
+            property_id,
 
-        "PERSON_LAST_NAME": last_name,
+        "SF_PROPERTY_ID":
+            property_id,
 
-        "ADDRESS1": address1,
+        "PROPERTY_NAME":
+            property_name,
 
-        "CITY": city,
-
-        "STATE_PROVINCE": state_province,
-
-        "COUNTRY": country,
-
-        "POSTAL_CODE": postal_code,
-
-        "BIRTHDATE": birthdate.isoformat(),
-
-        "GENDER": gender,
-
-        
-        
-        "SOURCE":"OPERA",
-
-        "ENTITY":"HOTEL",
-
-        "ENTITY_ACTION": entity_action,
-
-        "DURATION":game_duration_min,
-
-        "PROPERTY_NAME":property_name,
-
-        "PROPERTY_CODE":hotel_property_id,
-
-        "EVENT_ID": fake.bothify(text='EV-########'),
+        "HOTEL_RESERVATION_ID":
+            reservation_id,
 
         "HOTEL_MEMBERSHIP_CARD_NO":
-            fake.bothify(text='MC########'),
-
-        "HOTEL_MEMBERSHIP_LEVEL":
-            random.choice(
-                hotel_membership_levels
-            ),
-
-        "HOTEL_RESV_NAME_ID":
-            float(
-                random.randint(
-                    100000,
-                    999999
-                )
-            ),
+            membership_card,
 
         "HOTEL_MEMBERSHIP_ID":
-            float(
-                random.randint(
-                    10000,
-                    99999
-                )
-            ),
+            membership_id,
+
+        "HOTEL_MEMBERSHIP_LEVEL":
+            random.choice([
+                "Gold",
+                "Silver",
+                "Platinum",
+                "Diamond"
+            ]),
 
         "HOTEL_NAME_ID":
-            float(
-                random.randint(
-                    1000,
-                    9999
-                )
-            ),
-
-        "HOTEL_RESV_STATUS":
-            reservation_status,
-
-        "HOTEL_BUSINESS_DATE_CREATED":
-            business_created_date.isoformat(),
-
-        "HOTEL_BEGIN_DATE":
-            begin_date.isoformat(),
-
-        "HOTEL_END_DATE":
-            end_date.isoformat(),
+            fake.numerify("#####"),
 
         "HOTEL_FOLIO_CLOSE_DATE":
-            folio_close_date.isoformat(),
-
-        "HOTEL_CANCELLATION_DATE":
-            cancellation_date.isoformat()
-            if cancellation_date else None,
-
-        "HOTEL_REINSTATE_DATE":
-            reinstate_date.isoformat()
-            if reinstate_date else None,
-
-        "HOTEL_CANCELLATION_REASON_CODE":
-            cancellation_reason_code,
-
-        "HOTEL_CANCELLATION_REASON_DESC":
-            cancellation_reason_desc,
-
-        "HOTEL_CANCELLATION_NO":
-            cancellation_no,
-
-        "HOTEL_WL_TELEPHONE_NO":
-            fake.phone_number(),
-
-        "HOTEL_PAYMENT_METHOD":
-            random.choice(payment_methods),
-
-        "HOTEL_CHANNEL":
-            random.choice(channels),
-
-        "HOTEL_CUSTOM_REFERENCE":
-            fake.bothify(text='REF######'),
-
-        "HOTEL_GUEST_FIRST_NAME":
-            first_name,
-
-        "HOTEL_GUEST_LAST_NAME":
-            last_name,
-
-        "HOTEL_YM_CODE":
-            now.strftime("%Y%m"),
-
-        "HOTEL_RATEABLE_VALUE":
-            str(
-                round(
-                    random.uniform(80, 600),
-                    2
-                )
-            ),
-
-        "HOTEL_WL_PRIORITY":
-            random.choice([
-                "HIGH",
-                "MEDIUM",
-                "LOW"
-            ]),
-
-        "HOTEL_ROOM_FEATURES":
-            random.choice([
-                "Ocean View",
-                "Smoking",
-                "High Floor",
-                "Near Elevator",
-                "Pool Access"
-            ]),
+            check_out_date.date().isoformat(),
 
         "HOTEL_ADVANCE_CHECKED_IN_YN":
             random.choice(["Y", "N"]),
@@ -507,126 +137,327 @@ def generate_gaming_record(person_id: str):
         "HOTEL_WALKIN_YN":
             random.choice(["Y", "N"]),
 
-        "HOTEL_CASH_ROOM_REVENUE":
-            hotel_cash_room_revenue,
-
-        "HOTEL_COMP_ROOM_REVENUE":
-            hotel_comp_room_revenue,
-
-        "HOTEL_ROOM":
-            str(
-                random.randint(
-                    100,
-                    5000
-                )
-            ),
-
         "HOTEL_PSUEDO_ROOM_YN":
             random.choice(["Y", "N"]),
 
-        "HOTEL_ROOM_CLASS":
-            random.choice(room_classes),
+        "HOTEL_WL_TELEPHONE_NO":
+            fake.phone_number(),
 
-        "HOTEL_ROOM_CATEGORY":
-            random.choice(room_categories),
+        "HOTEL_PAYMENT_METHOD":
+            random.choice([
+                "CASH",
+                "CARD",
+                "COMP"
+            ]),
 
-        "HOTEL_ROOM_CATEGORY_DESCRIPTION":
-            "Luxury Room Category",
+        "HOTEL_CHANNEL":
+            random.choice([
+                "ONLINE",
+                "PHONE",
+                "WALKIN"
+            ]),
+
+        "HOTEL_CUSTOM_REFERENCE":
+            fake.bothify("REF######"),
+
+        "HOTEL_RATEABLE_VALUE":
+            round(
+                random.uniform(100, 800),
+                2
+            ),
+
+        "HOTEL_RESERVATION_STATUS":
+            reservation_status,
+
+        "HOTEL_REINSTATE_TIMESTAMP_PROPERTY":
+            None,
+
+        "HOTEL_EVENT_TIMESTAMP_PROPERTY_TIMEZONE":
+            "America/New_York",
+
+        "HOTEL_EVENT_TIMESTAMP_PROPERTY_TIMEZONE_ABBR":
+            "EST",
+
+        "HOTEL_RESERVATION_TIMESTAMP_PROPERTY":
+            begin_date.isoformat(),
+
+        "HOTEL_RESERVATION_CREATION_DATE":
+            begin_date.date().isoformat(),
+
+        "HOTEL_RESERVATION_TIMESTAMP_ADT":
+            timezone_map["ADT"],
+
+        "HOTEL_RESERVATION_TIMESTAMP_AST":
+            timezone_map["AST"],
+
+        "HOTEL_RESERVATION_TIMESTAMP_CDT":
+            timezone_map["CDT"],
+
+        "HOTEL_RESERVATION_TIMESTAMP_CST":
+            timezone_map["CST"],
+
+        "HOTEL_RESERVATION_TIMESTAMP_EST":
+            timezone_map["EST"],
+
+        "HOTEL_RESERVATION_TIMESTAMP_MDT":
+            timezone_map["MDT"],
+
+        "HOTEL_RESERVATION_TIMESTAMP_MST":
+            timezone_map["MST"],
+
+        "HOTEL_RESERVATION_TIMESTAMP_PDT":
+            timezone_map["PDT"],
+
+        "HOTEL_CHECK_IN_TIMESTAMP_PROPERTY":
+            begin_date.isoformat(),
+
+        "HOTEL_CHECK_OUT_TIMESTAMP_PROPERTY":
+            check_out_date.isoformat(),
+
+        "HOTEL_CHECK_IN_DATE":
+            begin_date.date().isoformat(),
+
+        "HOTEL_CHECK_IN_TIMESTAMP_ADT":
+            timezone_map["ADT"],
+
+        "HOTEL_CHECK_IN_TIMESTAMP_AST":
+            timezone_map["AST"],
+
+        "HOTEL_CHECK_IN_TIMESTAMP_CDT":
+            timezone_map["CDT"],
+
+        "HOTEL_CHECK_IN_TIMESTAMP_CST":
+            timezone_map["CST"],
+
+        "HOTEL_CHECK_IN_TIMESTAMP_EST":
+            timezone_map["EST"],
+
+        "HOTEL_CHECK_IN_TIMESTAMP_MDT":
+            timezone_map["MDT"],
+
+        "HOTEL_CHECK_IN_TIMESTAMP_MST":
+            timezone_map["MST"],
+
+        "HOTEL_CHECK_IN_TIMESTAMP_PDT":
+            timezone_map["PDT"],
+
+        "HOTEL_WL_PRIORITY":
+            random.choice([
+                "HIGH",
+                "MEDIUM",
+                "LOW"
+            ]),
+
+        "HOTEL_ROOM_FEATURES":
+            random.choice([
+                "Ocean View",
+                "VIP Lounge",
+                "Smoking"
+            ]),
 
         "HOTEL_BOOKED_ROOM_CATEGORY":
-            random.choice(room_categories),
-
-        "HOTEL_ADULTS":
-            str(
-                random.randint(1, 4)
-            ),
-
-        "HOTEL_CHILDREN":
-            str(
-                random.randint(0, 3)
-            ),
+            random.choice([
+                "KING",
+                "QUEEN",
+                "SUITE"
+            ]),
 
         "HOTEL_RATE_CODE":
-            fake.bothify(text='RATE###'),
+            fake.bothify("RATE###"),
 
         "HOTEL_RATE_CATEGORY":
-            random.choice(rate_categories),
+            random.choice([
+                "BAR",
+                "COMP",
+                "VIP"
+            ]),
 
         "HOTEL_MARKET_CODE":
-            random.choice(market_codes),
+            random.choice([
+                "LOCAL",
+                "VIP",
+                "TOURISM"
+            ]),
 
         "HOTEL_PROMOTION_CODE":
-            random.choice(promotion_codes),
+            random.choice([
+                "WELCOME",
+                "SUMMER",
+                "VIPFREE"
+            ]),
 
-        "HOTEL_NIGHTS":
+        "HOTEL_NUM_OF_NIGHTS_STAY":
             nights,
-        "LOAD_TIMESTAMP": datetime.now().isoformat()
+
+        "HOTEL_NUM_OF_NIGHTS_STAYS":
+            nights,
+
+        "HOTEL_ROOM_CLASS":
+            random.choice([
+                "STANDARD",
+                "DELUXE",
+                "SUITE"
+            ]),
+
+        "HOTEL_TRANSACTION_AMOUNT":
+            round(
+                random.uniform(100, 5000),
+                2
+            ),
+
+        "HOTEL_NUM_OF_ADULTS":
+            random.randint(1, 4),
+
+        "HOTEL_NUM_OF_CHILDREN":
+            random.randint(0, 3),
+
+        "HOTEL_SMOKING_ROOM":
+            random.choice(["Y", "N"]),
+
+        "HOTEL_ROOM_CATEGORY":
+            "KING",
+
+        "HOTEL_ROOM_CATEGORY_DESCRIPTION":
+            "Luxury King Room",
+
+        "HOTEL_ROOM_NUMBER":
+            room_number,
+
+        "HOTEL_CASH_ROOM_REVENUE":
+            round(
+                random.uniform(100, 3000),
+                2
+            ),
+
+        "HOTEL_COMP_ROOM_REVENUE":
+            round(
+                random.uniform(0, 1500),
+                2
+            ),
+
+        "HOTEL_CHECK_OUT_DATE":
+            check_out_date.date().isoformat(),
+
+        "HOTEL_CHECK_OUT_TIMESTAMP_ADT":
+            check_out_date.isoformat(),
+
+        "HOTEL_CHECK_OUT_TIMESTAMP_AST":
+            check_out_date.isoformat(),
+
+        "HOTEL_CHECK_OUT_TIMESTAMP_CDT":
+            check_out_date.isoformat(),
+
+        "HOTEL_CHECK_OUT_TIMESTAMP_CST":
+            check_out_date.isoformat(),
+
+        "HOTEL_CHECK_OUT_TIMESTAMP_EST":
+            check_out_date.isoformat(),
+
+        "HOTEL_CHECK_OUT_TIMESTAMP_MDT":
+            check_out_date.isoformat(),
+
+        "HOTEL_CHECK_OUT_TIMESTAMP_MST":
+            check_out_date.isoformat(),
+
+        "HOTEL_CHECK_OUT_TIMESTAMP_PDT":
+            check_out_date.isoformat(),
+
+        "HOTEL_CANCELLATION_NO":
+            None,
+
+        "HOTEL_CANCELLATION_REASON":
+            None,
+
+        "HOTEL_CANCELLATION_REASON_CODE":
+            None,
+
+        "HOTEL_CANCEL_TIMESTAMP_PROPERTY":
+            None,
+
+        "HOTEL_CANCEL_DATE":
+            None,
+
+        "HOTEL_CANCEL_TIMESTAMP_ADT":
+            None,
+
+        "HOTEL_CANCEL_TIMESTAMP_AST":
+            None,
+
+        "HOTEL_CANCEL_TIMESTAMP_CDT":
+            None,
+
+        "HOTEL_CANCEL_TIMESTAMP_CST":
+            None,
+
+        "HOTEL_CANCEL_TIMESTAMP_EST":
+            None,
+
+        "HOTEL_CANCEL_TIMESTAMP_MDT":
+            None,
+
+        "HOTEL_CANCEL_TIMESTAMP_MST":
+            None,
+
+        "HOTEL_CANCEL_TIMESTAMP_PDT":
+            None,
+
+        "FUTURE_CHECK_IN_PROPERTIES":
+            property_name,
+
+        "FUTURE_CHECK_IN_DATES":
+            begin_date.date().isoformat(),
+
+        "FUTURE_CHECK_IN_PROPERTIES_WITH_DATES":
+            f"{property_name} - {begin_date.date().isoformat()}"
     }
 
 
-@app.get("/v1/player-activity")
-async def get_player_activity(
-    players: int = 50,
-    records_per_player: int = 2
-):
-    """
-    Returns players with multiple gaming records.
-    Each player keeps same identity details
-    but has many gameplay transactions.
-    """
+@app.get("/v1/hotel-activity")
+async def hotel_activity():
 
-    records = []
+    api_url = "https://casino-api-ob26.onrender.com/v1/player-activity"
 
-    used_names = set()
+    response = requests.get(api_url)
 
-    i = 0
+    player_data = response.json()
 
-    while len(used_names) < players:
+    unique_activeclubids = []
 
-        # Stable UUID
-        fake.seed_instance(i)
+    seen = set()
 
-        player_id = fake.uuid4()
+    for row in player_data:
 
-        sample_record = generate_gaming_record(
-            person_id=player_id
-        )
+        activeclubid = row["ACTIVECLUBID"]
 
-        full_name = (
-            sample_record["PERSON_FIRST_NAME"] +
-            " " +
-            sample_record["PERSON_LAST_NAME"]
-        )
+        if activeclubid not in seen:
 
-        # Ensure unique player names
-        if full_name not in used_names:
+            seen.add(activeclubid)
 
-            used_names.add(full_name)
+            unique_activeclubids.append(
+                activeclubid
+            )
 
-            # Generate multiple records
-            for _ in range(records_per_player):
+        if len(unique_activeclubids) == 50:
+            break
 
-                records.append(
-                    generate_gaming_record(
-                        person_id=player_id
-                    )
+    final_records = []
+
+    for activeclubid in unique_activeclubids:
+
+        for action in [
+            "HOTEL:RESERVE",
+            "HOTEL:CHECK_IN",
+            "HOTEL:CHECK_OUT"
+        ]:
+
+            final_records.append(
+                generate_hotel_event(
+                    activeclubid,
+                    action
                 )
+            )
 
-        i += 1
-
-    return records
-
-
-@app.get("/v1/player/{person_id}")
-async def get_specific_player(person_id: str):
-    """
-    Returns a specific persistent player
-    with dynamic gaming activity.
-    """
-
-    return generate_gaming_record(
-        person_id=person_id
-    )
+    return final_records
 
 
 if __name__ == "__main__":
@@ -634,5 +465,5 @@ if __name__ == "__main__":
     uvicorn.run(
         app,
         host="0.0.0.0",
-        port=8001
+        port=8000
     )
