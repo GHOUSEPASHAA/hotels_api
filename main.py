@@ -59,9 +59,11 @@ def create_hotel_stay(activeclubid):
     check_out_date = begin_date + timedelta(
         days=nights
     )
+    
+    current_date = datetime.now()
 
     future_checkin_date = (
-    check_out_date +
+    current_date +
     timedelta(
         days=random.randint(10, 90)
     )
@@ -395,6 +397,34 @@ def create_hotel_stay(activeclubid):
     return stay_data
 
 
+# --- NEW FUNCTION FOR CANCELLATION ---
+def create_cancelled_hotel_stay(activeclubid):
+    """
+    Generates a baseline stay dict but overwrites cancellation-specific fields.
+    """
+    # Call the original generator to ensure metadata schema matches perfectly
+    stay_data = create_hotel_stay(activeclubid)
+    
+    # Simulate a cancellation happening slightly after the reservation timestamp
+    base_res_date = datetime.fromisoformat(stay_data["HOTEL_RESERVATION_TIMESTAMP_PROPERTY"])
+    cancel_date = base_res_date + timedelta(hours=random.randint(1, 24))
+    
+    # Overwrite the necessary cancellation fields
+    stay_data["HOTEL_CANCELLATION_NO"] = fake.numerify("CX#######")
+    stay_data["HOTEL_CANCELLATION_REASON"] = random.choice([
+        "Plan changed", "Personal emergency", "Weather constraints", "Found better rates"
+    ])
+    stay_data["HOTEL_CANCELLATION_REASON_CODE"] = random.choice(["GUEST", "WEATHER", "PRICE"])
+    stay_data["HOTEL_CANCEL_TIMESTAMP_PROPERTY"] = cancel_date.isoformat()
+    stay_data["HOTEL_CANCEL_DATE"] = cancel_date.date().isoformat()
+    
+    # Populate default alternate timezone variables for completeness
+    for tz in ["ADT", "AST", "CDT", "CST", "EST", "MDT", "MST", "PDT"]:
+        stay_data[f"HOTEL_CANCEL_TIMESTAMP_{tz}"] = cancel_date.isoformat()
+        
+    return stay_data
+
+
 def build_hotel_event(
     stay_data,
     event_action
@@ -405,7 +435,8 @@ def build_hotel_event(
     reservation_status = {
         "HOTEL:RESERVE": "RESERVED",
         "HOTEL:CHECK_IN": "CHECKED_IN",
-        "HOTEL:CHECK_OUT": "CHECKED_OUT"
+        "HOTEL:CHECK_OUT": "CHECKED_OUT",
+        "HOTEL:CANCEL": "CANCELLED"  # Mapping added here dynamically for the builder
     }
 
     record["ENTITY"] = "HOTEL"
@@ -728,8 +759,10 @@ async def hotel_activity():
 
     final_records = []
 
-    for activeclubid in unique_activeclubids:
+    # Using enumerate to track row count safely
+    for index, activeclubid in enumerate(unique_activeclubids):
 
+        # --- NORMAL STAYS FLOW ---
         stay_data = create_hotel_stay(
             activeclubid
         )
@@ -745,6 +778,56 @@ async def hotel_activity():
                     stay_data,
                     action
                 )
+            )
+            
+        # --- CONDITIONAL CANCELLATION FLOW ---
+        # Checks if the current person index is within the first 30 people (0 to 29)
+        if index < 30:
+            cancelled_stay_data = create_cancelled_hotel_stay(activeclubid)
+            
+            # --- CLEANUP FOR HOTEL B (Wipe check-in, check-out, room numbers, and revenue) ---
+            # These values shouldn't exist because the guest never stepped foot in the hotel
+            fields_to_nullify = [
+                "HOTEL_ROOM_NUMBER",
+                "HOTEL_CASH_ROOM_REVENUE",
+                "HOTEL_COMP_ROOM_REVENUE",
+                "HOTEL_FOLIO_CLOSE_DATE",
+                "HOTEL_CHECK_IN_DATE",
+                "HOTEL_CHECK_OUT_DATE",
+                "HOTEL_CHECK_IN_TIMESTAMP_PROPERTY",
+                "HOTEL_CHECK_OUT_TIMESTAMP_PROPERTY"
+            ]
+            
+            # Wipe out the dynamic timezone variables for check-in and check-out too
+            for tz in ["ADT", "AST", "CDT", "CST", "EST", "MDT", "MST", "PDT"]:
+                fields_to_nullify.append(f"HOTEL_CHECK_IN_TIMESTAMP_{tz}")
+                fields_to_nullify.append(f"HOTEL_CHECK_OUT_TIMESTAMP_{tz}")
+                
+            # Apply the nullification to the base dataset
+            for field in fields_to_nullify:
+                cancelled_stay_data[field] = None
+
+            # --- BUILD HOTEL B: RESERVE EVENT ---
+            # Make a copy and strip out cancellation details (since it hasn't happened yet)
+            reserve_only_data = cancelled_stay_data.copy()
+            reserve_only_data["HOTEL_CANCELLATION_NO"] = None
+            reserve_only_data["HOTEL_CANCELLATION_REASON"] = None
+            reserve_only_data["HOTEL_CANCELLATION_REASON_CODE"] = None
+            reserve_only_data["HOTEL_CANCEL_TIMESTAMP_PROPERTY"] = None
+            reserve_only_data["HOTEL_CANCEL_DATE"] = None
+            
+            for tz in ["ADT", "AST", "CDT", "CST", "EST", "MDT", "MST", "PDT"]:
+                reserve_only_data[f"HOTEL_CANCEL_TIMESTAMP_{tz}"] = None
+
+            # Emit the clean RESERVE event for Hotel B
+            final_records.append(
+                build_hotel_event(reserve_only_data, "HOTEL:RESERVE")
+            )
+            
+            # --- BUILD HOTEL B: CANCEL EVENT ---
+            # Emit the CANCEL event for Hotel B (Now includes cancel details, but still has no check-in/out data)
+            final_records.append(
+                build_hotel_event(cancelled_stay_data, "HOTEL:CANCEL")
             )
 
     return final_records
